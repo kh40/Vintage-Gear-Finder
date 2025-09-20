@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Vintage Gear Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav {
+            margin-bottom: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .nav a:hover {
+            opacity: 1;
+        }
+
+        .results-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px 15px 0 0;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filters {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 25px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: #4a5568;
+            white-space: nowrap;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .results-table-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .results-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        .results-table tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .marketplace-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .marketplace-ebay {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .marketplace-reverb {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .condition-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .condition-excellent,
+        .condition-mint {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .condition-very-good {
+            background: #bee3f8;
+            color: #2a69ac;
+        }
+
+        .condition-good {
+            background: #fbb6ce;
+            color: #97266d;
+        }
+
+        .price {
+            font-weight: 700;
+            color: #38a169;
+            font-size: 1.1em;
+        }
+
+        .title-cell {
+            max-width: 400px;
+        }
+
+        .title-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            line-height: 1.4;
+            display: block;
+        }
+
+        .title-link:hover {
+            text-decoration: underline;
+        }
+
+        .year-badge {
+            background: #4299e1;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .no-results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .pagination {
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 0 15px 15px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .image-cell {
+            width: 80px;
+        }
+
+        .listing-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+
+        @media (max-width: 1200px) {
+            .results-table th:nth-child(6),
+            .results-table td:nth-child(6) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .results-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .results-table {
+                font-size: 14px;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 10px 8px;
+            }
+            
+            .title-cell {
+                max-width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .results-table th:nth-child(4),
+            .results-table td:nth-child(4),
+            .results-table th:nth-child(5),
+            .results-table td:nth-child(5) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="nav">
+                <a href="/">← Back to Dashboard</a>
+            </div>
+            <h1>📋 All Results</h1>
+            <p>Complete listing of found vintage gear</p>
+        </div>
+
+        <div class="results-header">
+            <div class="results-stats">
+                <div class="stat">
+                    <div class="stat-number">{{ results|length }}</div>
+                    <div class="stat-label">Total Items</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">${{ "%.0f"|format(results|map(attribute='price')|sum) if results else 0 }}</div>
+                    <div class="stat-label">Total Value</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">${{ "%.0f"|format(results|map(attribute='price')|list|average) if results else 0 }}</div>
+                    <div class="stat-label">Avg Price</div>
+                </div>
+            </div>
+            <div>
+                <button onclick="location.reload()" class="btn">Refresh</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Marketplace:</label>
+                <select id="marketplace-filter">
+                    <option value="">All</option>
+                    <option value="eBay">eBay</option>
+                    <option value="Reverb">Reverb</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Condition:</label>
+                <select id="condition-filter">
+                    <option value="">All</option>
+                    <option value="Mint">Mint</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Very Good">Very Good</option>
+                    <option value="Good">Good</option>
+                    <option value="Fair">Fair</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Max Price:</label>
+                <input type="number" id="price-filter" placeholder="e.g. 500" min="0" step="50">
+            </div>
+            <div class="filter-group">
+                <label>Year:</label>
+                <input type="number" id="year-filter" placeholder="e.g. 1965" min="1920" max="1979">
+            </div>
+            <div class="filter-group">
+                <label>Search:</label>
+                <input type="text" id="search-filter" placeholder="Search titles...">
+            </div>
+        </div>
+
+        <div class="results-table-container">
+            {% if results %}
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Marketplace</th>
+                            <th>Title</th>
+                            <th>Price</th>
+                            <th>Year</th>
+                            <th>Condition</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                        {% for result in results %}
+                        <tr data-marketplace="{{ result.marketplace }}" 
+                            data-condition="{{ result.condition }}" 
+                            data-price="{{ result.price }}" 
+                            data-year="{{ result.year or '' }}"
+                            data-title="{{ result.title|lower }}">
+                            <td class="image-cell">
+                                {% if result.image_url %}
+                                    <img src="{{ result.image_url }}" alt="Item image" class="listing-image" 
+                                         onerror="this.style.display='none'">
+                                {% else %}
+                                    <div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px;">
+                                        No Image
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="marketplace-badge marketplace-{{ result.marketplace.lower() }}">
+                                    {{ result.marketplace }}
+                                </span>
+                            </td>
+                            <td class="title-cell">
+                                <a href="{{ result.url }}" target="_blank" class="title-link">
+                                    {{ result.title }}
+                                </a>
+                            </td>
+                            <td class="price">${{ "%.2f"|format(result.price) }}</td>
+                            <td>
+                                {% if result.year %}
+                                    <span class="year-badge">{{ result.year }}</span>
+                                {% else %}
+                                    <span style="color: #999;">Unknown</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="condition-badge condition-{{ result.condition.lower().replace(' ', '-') }}">
+                                    {{ result.condition }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ result.url }}" target="_blank" class="btn btn-small">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-results">
+                    <div class="no-results-icon">🎸</div>
+                    <h3>No results found</h3>
+                    <p>Run a scrape from the dashboard to populate results</p>
+                    <a href="/" class="btn" style="margin-top: 20px;">Go to Dashboard</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Filter functionality
+        const filters = {
+            marketplace: document.getElementById('marketplace-filter'),
+            condition: document.getElementById('condition-filter'),
+            price: document.getElementById('price-filter'),
+            year: document.getElementById('year-filter'),
+            search: document.getElementById('search-filter')
+        };
+
+        const tbody = document.getElementById('results-tbody');
+        const allRows = Array.from(tbody?.querySelectorAll('tr') || []);
+
+        function applyFilters() {
+            if (!tbody) return;
+
+            const marketplaceFilter = filters.marketplace.value;
+            const conditionFilter = filters.condition.value;
+            const priceFilter = parseFloat(filters.price.value) || null;
+            const yearFilter = parseInt(filters.year.value) || null;
+            const searchFilter = filters.search.value.toLowerCase();
+
+            allRows.forEach(row => {
+                let show = true;
+
+                // Marketplace filter
+                if (marketplaceFilter && row.dataset.marketplace !== marketplaceFilter) {
+                    show = false;
+                }
+
+                // Condition filter
+                if (conditionFilter && row.dataset.condition !== conditionFilter) {
+                    show = false;
+                }
+
+                // Price filter
+                if (priceFilter && parseFloat(row.dataset.price) > priceFilter) {
+                    show = false;
+                }
+
+                // Year filter
+                if (yearFilter && parseInt(row.dataset.year) !== yearFilter) {
+                    show = false;
+                }
+
+                // Search filter
+                if (searchFilter && !row.dataset.title.includes(searchFilter)) {
+                    show = false;
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            const visibleRows = allRows.filter(row => row.style.display !== 'none');
+            const totalItems = visibleRows.length;
+            const totalValue = visibleRows.reduce((sum, row) => sum + parseFloat(row.dataset.price), 0);
+            const avgPrice = totalItems > 0 ? totalValue / totalItems : 0;
+
+            // Update stat numbers
+            const statNumbers = document.querySelectorAll('.stat-number');
+            if (statNumbers.length >= 3) {
+                statNumbers[0].textContent = totalItems;
+                statNumbers[1].textContent = '$' + Math.round(totalValue);
+                statNumbers[2].textContent = '$' + Math.round(avgPrice);
+            }
+        }
+
+        // Add event listeners
+        Object.values(filters).forEach(filter => {
+            filter.addEventListener('input', applyFilters);
+            filter.addEventListener('change', applyFilters);
+        });
+
+        // Initialize
+        updateStats();
+    </script>
+</body>
+</html>
