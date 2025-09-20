@@ -9,7 +9,6 @@ gspread==5.12.0
 google-auth==2.23.4
 google-auth-oauthlib==1.1.0
 google-auth-httplib2==0.1.1
-pydantic==2.5.0
+pydantic==1.10.12
 python-dotenv==1.0.0
 requests==2.31.0
-# Remove lxml - use html.parser instead for BeautifulSoup
