@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  vintage-gear-finder:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - EBAY_API_KEY=${EBAY_API_KEY:-}
+      - REVERB_API_KEY=${REVERB_API_KEY:-}
+      - GOOGLE_SHEETS_ID=${GOOGLE_SHEETS_ID:-}
+      - GOOGLE_CREDENTIALS_JSON=${GOOGLE_CREDENTIALS_JSON:-}
+      - MAX_YEAR=${MAX_YEAR:-1979}
+      - MAX_PRICE_PERCENTAGE=${MAX_PRICE_PERCENTAGE:-0.60}
+      - MIN_CONDITION=${MIN_CONDITION:-Good}
+    volumes:
+      - ./config.json:/app/config.json
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
